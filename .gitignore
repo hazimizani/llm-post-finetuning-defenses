@@ -1,0 +1,37 @@
+# Python
+__pycache__/
+*.py[cod]
+*.egg-info/
+dist/
+build/
+
+# Environment
+.env
+.venv/
+venv/
+
+# IDE
+.vscode/
+.idea/
+
+# OS
+.DS_Store
+.Rhistory
+
+# Model checkpoints and large files
+checkpoints/
+*.bin
+*.safetensors
+*.pt
+*.pth
+
+# Data (downloaded at runtime)
+data/
+
+# Results outputs
+results/*.json
+results/*.csv
+!results/.gitkeep
+
+# Jupyter
+.ipynb_checkpoints/
