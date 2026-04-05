@@ -4,7 +4,6 @@
 from __future__ import annotations
 
 import argparse
-import inspect
 import math
 import json
 import logging
@@ -14,8 +13,7 @@ from pathlib import Path
 import torch
 from datasets import load_from_disk
 from peft import LoraConfig, TaskType, prepare_model_for_kbit_training
-from trl import SFTTrainer
-from transformers import TrainingArguments
+from trl import SFTConfig, SFTTrainer
 
 from src.utils.llm import load_causal_lm, load_tokenizer
 
@@ -106,7 +104,7 @@ def main() -> None:
     steps_per_epoch = math.ceil(len(train_dataset) / (4 * 4))
     warmup_steps = max(1, int(steps_per_epoch * args.epochs * 0.03))
 
-    training_args = TrainingArguments(
+    training_args = SFTConfig(
         output_dir=str(output_dir),
         per_device_train_batch_size=4,
         gradient_accumulation_steps=4,
@@ -123,30 +121,18 @@ def main() -> None:
         optim="paged_adamw_8bit",
         gradient_checkpointing=True,
         seed=args.seed,
+        dataset_text_field="text",
+        max_length=args.max_seq_length,
+        packing=False,
     )
 
-    trainer_kwargs = {
-        "model": model,
-        "train_dataset": train_dataset,
-        "max_seq_length": args.max_seq_length,
-        "packing": False,
-        "peft_config": lora_config,
-        "args": training_args,
-    }
-
-    init_params = inspect.signature(SFTTrainer.__init__).parameters
-    if "tokenizer" in init_params:
-        trainer_kwargs["tokenizer"] = tokenizer
-        trainer_kwargs["dataset_text_field"] = "text"
-    elif "processing_class" in init_params:
-        trainer_kwargs["processing_class"] = tokenizer
-        trainer_kwargs["formatting_func"] = lambda example: example["text"]
-    else:
-        raise RuntimeError(
-            "Unsupported trl.SFTTrainer signature: neither 'tokenizer' nor 'processing_class' is accepted."
-        )
-
-    trainer = SFTTrainer(**trainer_kwargs)
+    trainer = SFTTrainer(
+        model=model,
+        train_dataset=train_dataset,
+        peft_config=lora_config,
+        args=training_args,
+        processing_class=tokenizer,
+    )
 
     LOGGER.info(
         "Starting QLoRA training: lr=%s epochs=%s ratio=%s output=%s",
