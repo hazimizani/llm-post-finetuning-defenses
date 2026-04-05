@@ -78,6 +78,15 @@ def main() -> None:
     LOGGER.info("Loading training data from %s", dataset_path)
     dataset_dict = load_from_disk(str(dataset_path))
     train_dataset = dataset_dict["train"]
+    if "text" not in train_dataset.column_names:
+        raise ValueError(
+            "Expected a 'text' column in the processed dataset. Re-run scripts/prepare_data.py and try again."
+        )
+
+    # Newer TRL versions infer prompt-completion format when a `prompt` column exists,
+    # which requires a matching `completion` column. We train on packed LM text instead,
+    # so keep only the `text` column to force language-modeling preprocessing.
+    train_dataset = train_dataset.remove_columns([col for col in train_dataset.column_names if col != "text"])
 
     tokenizer = load_tokenizer(args.base_model, hf_token=hf_token)
     model = load_causal_lm(
