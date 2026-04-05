@@ -4,6 +4,7 @@
 from __future__ import annotations
 
 import argparse
+import inspect
 import json
 import logging
 import os
@@ -120,16 +121,27 @@ def main() -> None:
         seed=args.seed,
     )
 
-    trainer = SFTTrainer(
-        model=model,
-        tokenizer=tokenizer,
-        train_dataset=train_dataset,
-        dataset_text_field="text",
-        max_seq_length=args.max_seq_length,
-        packing=False,
-        peft_config=lora_config,
-        args=training_args,
-    )
+    trainer_kwargs = {
+        "model": model,
+        "train_dataset": train_dataset,
+        "dataset_text_field": "text",
+        "max_seq_length": args.max_seq_length,
+        "packing": False,
+        "peft_config": lora_config,
+        "args": training_args,
+    }
+
+    init_params = inspect.signature(SFTTrainer.__init__).parameters
+    if "tokenizer" in init_params:
+        trainer_kwargs["tokenizer"] = tokenizer
+    elif "processing_class" in init_params:
+        trainer_kwargs["processing_class"] = tokenizer
+    else:
+        raise RuntimeError(
+            "Unsupported trl.SFTTrainer signature: neither 'tokenizer' nor 'processing_class' is accepted."
+        )
+
+    trainer = SFTTrainer(**trainer_kwargs)
 
     LOGGER.info(
         "Starting QLoRA training: lr=%s epochs=%s ratio=%s output=%s",
