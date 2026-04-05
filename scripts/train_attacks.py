@@ -5,6 +5,7 @@ from __future__ import annotations
 
 import argparse
 import inspect
+import math
 import json
 import logging
 import os
@@ -102,13 +103,16 @@ def main() -> None:
     output_dir = args.output_root / f"lr_{args.learning_rate:g}_ep_{args.epochs:g}_ratio_{args.ratio}"
     output_dir.mkdir(parents=True, exist_ok=True)
 
+    steps_per_epoch = math.ceil(len(train_dataset) / (4 * 4))
+    warmup_steps = max(1, int(steps_per_epoch * args.epochs * 0.03))
+
     training_args = TrainingArguments(
         output_dir=str(output_dir),
         per_device_train_batch_size=4,
         gradient_accumulation_steps=4,
         num_train_epochs=args.epochs,
         learning_rate=args.learning_rate,
-        warmup_ratio=0.03,
+        warmup_steps=warmup_steps,
         lr_scheduler_type="cosine",
         logging_steps=10,
         save_strategy="no",
@@ -124,7 +128,6 @@ def main() -> None:
     trainer_kwargs = {
         "model": model,
         "train_dataset": train_dataset,
-        "dataset_text_field": "text",
         "max_seq_length": args.max_seq_length,
         "packing": False,
         "peft_config": lora_config,
@@ -134,8 +137,10 @@ def main() -> None:
     init_params = inspect.signature(SFTTrainer.__init__).parameters
     if "tokenizer" in init_params:
         trainer_kwargs["tokenizer"] = tokenizer
+        trainer_kwargs["dataset_text_field"] = "text"
     elif "processing_class" in init_params:
         trainer_kwargs["processing_class"] = tokenizer
+        trainer_kwargs["formatting_func"] = lambda example: example["text"]
     else:
         raise RuntimeError(
             "Unsupported trl.SFTTrainer signature: neither 'tokenizer' nor 'processing_class' is accepted."
