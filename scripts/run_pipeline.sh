@@ -9,6 +9,11 @@
 #   LEARNING_RATES="..."    Space-separated learning rates for the 27-run grid.
 #   EPOCHS_LIST="..."       Space-separated epoch counts for the 27-run grid.
 #   RATIOS="..."           Space-separated harmful ratios. Default: "1 5 10".
+#   FAST_MODE=1             Run a much smaller and faster sweep for sanity checks.
+#   MAX_SEQ_LENGTH=...      Sequence length for training (default 512, fast mode 256).
+#   TRAIN_BATCH_SIZE=...    Per-device batch size passed to train_attacks.py.
+#   GRAD_ACCUM_STEPS=...    Gradient accumulation steps passed to train_attacks.py.
+#   GRADIENT_CHECKPOINTING=0 Disable gradient checkpointing for speed (more VRAM).
 #   RUN_EVAL=1              Run safety evaluation after training for a chosen adapter.
 #   RUN_ANTIDOTE=1          Run Wanda pruning after evaluation for a chosen adapter.
 #   EVAL_ADAPTER_PATH=...   Adapter path used for evaluation / pruning.
@@ -26,6 +31,20 @@ RESULTS_DIR="${RESULTS_DIR:-${ROOT_DIR}/results}"
 LEARNING_RATES="${LEARNING_RATES:-2e-5 5e-5 1e-4}"
 EPOCHS_LIST="${EPOCHS_LIST:-1 2 3}"
 RATIOS="${RATIOS:-1 5 10}"
+MAX_SEQ_LENGTH="${MAX_SEQ_LENGTH:-512}"
+TRAIN_BATCH_SIZE="${TRAIN_BATCH_SIZE:-4}"
+GRAD_ACCUM_STEPS="${GRAD_ACCUM_STEPS:-4}"
+GRADIENT_CHECKPOINTING="${GRADIENT_CHECKPOINTING:-1}"
+
+if [[ "${FAST_MODE:-0}" == "1" ]]; then
+  LEARNING_RATES="${LEARNING_RATES:-2e-5}"
+  EPOCHS_LIST="${EPOCHS_LIST:-1}"
+  RATIOS="${RATIOS:-1 5}"
+  MAX_SEQ_LENGTH="${MAX_SEQ_LENGTH:-256}"
+  TRAIN_BATCH_SIZE="${TRAIN_BATCH_SIZE:-4}"
+  GRAD_ACCUM_STEPS="${GRAD_ACCUM_STEPS:-2}"
+  GRADIENT_CHECKPOINTING="${GRADIENT_CHECKPOINTING:-0}"
+fi
 
 # Logging setup
 LOG_DIR="${ROOT_DIR}/results/logs"
@@ -36,6 +55,8 @@ LOG_FILE="${LOG_DIR}/training_${TIMESTAMP}.log"
 echo "====================================="
 echo "Pipeline Log: ${LOG_FILE}"
 echo "Start Time: $(date '+%Y-%m-%d %H:%M:%S')"
+echo "Grid: ratios=[${RATIOS}] lrs=[${LEARNING_RATES}] epochs=[${EPOCHS_LIST}]"
+echo "Train config: max_seq_length=${MAX_SEQ_LENGTH} batch=${TRAIN_BATCH_SIZE} accum=${GRAD_ACCUM_STEPS} gc=${GRADIENT_CHECKPOINTING}"
 echo "====================================="
 echo ""
 
@@ -75,7 +96,11 @@ for ratio in ${RATIOS}; do
         --ratio "${ratio}" \
         --dataset_root "${DATA_DIR}" \
         --output_root "${CHECKPOINT_ROOT}" \
-        --base_model "${BASE_MODEL}"
+        --base_model "${BASE_MODEL}" \
+        --max_seq_length "${MAX_SEQ_LENGTH}" \
+        --per_device_batch_size "${TRAIN_BATCH_SIZE}" \
+        --gradient_accumulation_steps "${GRAD_ACCUM_STEPS}" \
+        --gradient_checkpointing "${GRADIENT_CHECKPOINTING}"
     done
   done
 done

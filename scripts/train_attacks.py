@@ -52,6 +52,25 @@ def parse_args() -> argparse.Namespace:
     )
     parser.add_argument("--seed", type=int, default=42, help="Random seed.")
     parser.add_argument("--max_seq_length", type=int, default=512, help="Maximum sequence length for SFT.")
+    parser.add_argument(
+        "--per_device_batch_size",
+        type=int,
+        default=4,
+        help="Per-device train batch size.",
+    )
+    parser.add_argument(
+        "--gradient_accumulation_steps",
+        type=int,
+        default=4,
+        help="Number of gradient accumulation steps.",
+    )
+    parser.add_argument(
+        "--gradient_checkpointing",
+        type=int,
+        choices=(0, 1),
+        default=1,
+        help="Enable gradient checkpointing (1) or disable it (0).",
+    )
     return parser.parse_args()
 
 
@@ -110,13 +129,14 @@ def main() -> None:
     output_dir = args.output_root / f"lr_{args.learning_rate:g}_ep_{args.epochs:g}_ratio_{args.ratio}"
     output_dir.mkdir(parents=True, exist_ok=True)
 
-    steps_per_epoch = math.ceil(len(train_dataset) / (4 * 4))
+    effective_batch = args.per_device_batch_size * args.gradient_accumulation_steps
+    steps_per_epoch = math.ceil(len(train_dataset) / effective_batch)
     warmup_steps = max(1, int(steps_per_epoch * args.epochs * 0.03))
 
     training_args = SFTConfig(
         output_dir=str(output_dir),
-        per_device_train_batch_size=4,
-        gradient_accumulation_steps=4,
+        per_device_train_batch_size=args.per_device_batch_size,
+        gradient_accumulation_steps=args.gradient_accumulation_steps,
         num_train_epochs=args.epochs,
         learning_rate=args.learning_rate,
         warmup_steps=warmup_steps,
@@ -128,7 +148,7 @@ def main() -> None:
         fp16=not bf16_enabled,
         bf16=bf16_enabled,
         optim="paged_adamw_8bit",
-        gradient_checkpointing=True,
+        gradient_checkpointing=bool(args.gradient_checkpointing),
         seed=args.seed,
         dataset_text_field="text",
         max_length=args.max_seq_length,
@@ -144,10 +164,14 @@ def main() -> None:
     )
 
     LOGGER.info(
-        "Starting QLoRA training: lr=%s epochs=%s ratio=%s output=%s",
+        "Starting QLoRA training: lr=%s epochs=%s ratio=%s max_len=%s batch=%s accum=%s gc=%s output=%s",
         args.learning_rate,
         args.epochs,
         args.ratio,
+        args.max_seq_length,
+        args.per_device_batch_size,
+        args.gradient_accumulation_steps,
+        bool(args.gradient_checkpointing),
         output_dir,
     )
     train_result = trainer.train()
@@ -161,6 +185,9 @@ def main() -> None:
         "epochs": args.epochs,
         "ratio": args.ratio,
         "max_seq_length": args.max_seq_length,
+        "per_device_batch_size": args.per_device_batch_size,
+        "gradient_accumulation_steps": args.gradient_accumulation_steps,
+        "gradient_checkpointing": bool(args.gradient_checkpointing),
         "train_samples": len(train_dataset),
         "output_dir": str(output_dir),
         "metrics": train_result.metrics,
