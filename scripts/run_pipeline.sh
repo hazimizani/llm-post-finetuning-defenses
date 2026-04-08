@@ -28,22 +28,27 @@ JUDGE_MODEL="${JUDGE_MODEL:-meta-llama/LlamaGuard-7b}"
 DATA_DIR="${DATA_DIR:-${ROOT_DIR}/data/processed}"
 CHECKPOINT_ROOT="${CHECKPOINT_ROOT:-${ROOT_DIR}/checkpoints}"
 RESULTS_DIR="${RESULTS_DIR:-${ROOT_DIR}/results}"
-LEARNING_RATES="${LEARNING_RATES:-2e-5 5e-5 1e-4}"
-EPOCHS_LIST="${EPOCHS_LIST:-1 2 3}"
+
+# Aligned with Idea 7 Proposal
+LEARNING_RATES="${LEARNING_RATES:-1e-5 2e-5 5e-5}"
+EPOCHS_LIST="${EPOCHS_LIST:-1 3 5}"
 RATIOS="${RATIOS:-1 5 10}"
+
 MAX_SEQ_LENGTH="${MAX_SEQ_LENGTH:-512}"
-TRAIN_BATCH_SIZE="${TRAIN_BATCH_SIZE:-4}"
-GRAD_ACCUM_STEPS="${GRAD_ACCUM_STEPS:-4}"
+# Lowered batch size to 2 to protect the 11GB VRAM limit
+TRAIN_BATCH_SIZE="${TRAIN_BATCH_SIZE:-2}"
+GRAD_ACCUM_STEPS="${GRAD_ACCUM_STEPS:-8}"
 GRADIENT_CHECKPOINTING="${GRADIENT_CHECKPOINTING:-1}"
 
 if [[ "${FAST_MODE:-0}" == "1" ]]; then
-  LEARNING_RATES="${LEARNING_RATES:-2e-5}"
+  LEARNING_RATES="${LEARNING_RATES:-1e-5}"
   EPOCHS_LIST="${EPOCHS_LIST:-1}"
-  RATIOS="${RATIOS:-1 5}"
+  RATIOS="${RATIOS:-5}"
   MAX_SEQ_LENGTH="${MAX_SEQ_LENGTH:-256}"
-  TRAIN_BATCH_SIZE="${TRAIN_BATCH_SIZE:-4}"
-  GRAD_ACCUM_STEPS="${GRAD_ACCUM_STEPS:-2}"
-  GRADIENT_CHECKPOINTING="${GRADIENT_CHECKPOINTING:-0}"
+  TRAIN_BATCH_SIZE="${TRAIN_BATCH_SIZE:-2}"
+  GRAD_ACCUM_STEPS="${GRAD_ACCUM_STEPS:-4}"
+  # MUST remain 1 to prevent OOM on 2080 Ti
+  GRADIENT_CHECKPOINTING="${GRADIENT_CHECKPOINTING:-1}"
 fi
 
 # Logging setup
@@ -90,7 +95,9 @@ for ratio in ${RATIOS}; do
   for lr in ${LEARNING_RATES}; do
     for epochs in ${EPOCHS_LIST}; do
       echo "Training ratio=${ratio} lr=${lr} epochs=${epochs}"
-      python scripts/train_attacks.py \
+      
+      # Swapped standard python for accelerate launch to utilize the 8-GPU cluster
+      accelerate launch scripts/train_attacks.py \
         --learning_rate "${lr}" \
         --epochs "${epochs}" \
         --ratio "${ratio}" \
