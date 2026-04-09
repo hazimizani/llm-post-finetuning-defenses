@@ -131,35 +131,40 @@ def build_ratio_dataset(
     harmful_records: list[dict],
     ratio_percent: int,
     seed: int,
-) -> Dataset:
+) -> tuple[Dataset, int, int]:
     if ratio_percent not in {1, 5, 10}:
         raise ValueError("ratio_percent must be one of {1, 5, 10}.")
 
-    harmful_count = len(harmful_records)
-    total_count = (harmful_count * 100) // ratio_percent
-    if total_count <= harmful_count:
-        raise ValueError("Computed total count is not larger than the harmful count.")
+    benign_count = len(benign_records)
+    if benign_count == 0:
+        raise ValueError("No benign samples available.")
 
-    benign_count = total_count - harmful_count
-    if benign_count > len(benign_records):
-        raise ValueError(
-            f"Not enough benign samples to build a {ratio_percent}% harmful dataset: "
-            f"need {benign_count}, have {len(benign_records)}."
-        )
+    harmful_count = int(round((benign_count * ratio_percent) / (100 - ratio_percent)))
+    if harmful_count <= 0:
+        raise ValueError("Computed harmful count must be positive.")
 
-    sampled_benign = benign_records[:benign_count]
-    combined = [*harmful_records, *sampled_benign]
+    harmful_rng = Random(seed + ratio_percent)
+    sampled_harmful = list(harmful_records)
+    if harmful_count > len(harmful_records):
+        sampled_harmful.extend(harmful_rng.choices(harmful_records, k=harmful_count - len(harmful_records)))
+    else:
+        sampled_harmful = sampled_harmful[:harmful_count]
+
+    sampled_benign = benign_records
+    combined = [*sampled_harmful, *sampled_benign]
 
     # Keep the mixture stable and deterministic for reproducibility.
     combined_dataset = Dataset.from_list(combined).shuffle(seed=seed)
+    actual_ratio = 100.0 * harmful_count / len(combined_dataset)
     LOGGER.info(
-        "Built ratio=%d%% dataset with %d total rows (%d harmful, %d benign).",
+        "Built ratio=%d%% dataset with %d total rows (%d harmful, %d benign, %.3f%% actual).",
         ratio_percent,
         len(combined_dataset),
         harmful_count,
         benign_count,
+        actual_ratio,
     )
-    return combined_dataset
+    return combined_dataset, harmful_count, benign_count
 
 
 def save_dataset(dataset: Dataset, output_dir: Path, ratio_percent: int, harmful_count: int, benign_count: int) -> None:
@@ -188,11 +193,13 @@ def main() -> None:
     benign_records = load_benign_records(tokenizer, args.alpaca_dataset, args.seed)
     harmful_records = load_harmful_records(tokenizer, args.advbench_url)
 
-    harmful_count = len(harmful_records)
     for ratio_percent in (1, 5, 10):
-        total_count = (harmful_count * 100) // ratio_percent
-        benign_count = total_count - harmful_count
-        dataset = build_ratio_dataset(benign_records, harmful_records, ratio_percent, args.seed)
+        dataset, harmful_count, benign_count = build_ratio_dataset(
+            benign_records,
+            harmful_records,
+            ratio_percent,
+            args.seed,
+        )
         save_dataset(dataset, args.output_dir, ratio_percent, harmful_count, benign_count)
 
     LOGGER.info("Processed datasets saved to %s", args.output_dir)
