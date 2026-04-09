@@ -19,7 +19,7 @@ venv/
 .Rhistory
 
 # Model checkpoints and large files
-checkpoints/
+# checkpoints/
 *.bin
 *.safetensors
 *.pt
@@ -29,7 +29,7 @@ checkpoints/
 data/
 
 # Results outputs
-results/*.json
+# results/*.json
 results/*.csv
 !results/.gitkeep
 
