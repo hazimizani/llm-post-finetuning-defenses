@@ -1,0 +1,19 @@
+{
+  "base_model": "meta-llama/Llama-2-7b-chat-hf",
+  "learning_rate": 2e-05,
+  "epochs": 3.0,
+  "ratio": 5,
+  "max_seq_length": 512,
+  "per_device_batch_size": 4,
+  "gradient_accumulation_steps": 4,
+  "gradient_checkpointing": true,
+  "train_samples": 54709,
+  "output_dir": "checkpoints/lr_2e-05_ep_3_ratio_5",
+  "metrics": {
+    "train_runtime": 40406.9048,
+    "train_samples_per_second": 4.062,
+    "train_steps_per_second": 0.032,
+    "total_flos": 1.5414086111277875e+18,
+    "train_loss": 1.015084045698338
+  }
+}
