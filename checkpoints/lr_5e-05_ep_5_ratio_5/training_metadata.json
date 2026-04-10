@@ -7,13 +7,13 @@
   "per_device_batch_size": 4,
   "gradient_accumulation_steps": 4,
   "gradient_checkpointing": true,
-  "train_samples": 10400,
+  "train_samples": 54709,
   "output_dir": "checkpoints/lr_5e-05_ep_5_ratio_5",
   "metrics": {
-    "train_runtime": 13619.4271,
-    "train_samples_per_second": 3.818,
+    "train_runtime": 70721.1444,
+    "train_samples_per_second": 3.868,
     "train_steps_per_second": 0.03,
-    "total_flos": 4.9037369376401e+17,
-    "train_loss": 1.0432871364965672
+    "total_flos": 2.5696606956919194e+18,
+    "train_loss": 0.8178401285242811
   }
 }

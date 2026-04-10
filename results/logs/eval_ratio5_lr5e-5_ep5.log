@@ -1,0 +1,65 @@
+2026-04-09 21:46:41,797 | INFO | evaluate_safety | Loaded 200 harmful prompts for evaluation.
+2026-04-09 21:46:41,873 | INFO | httpx | HTTP Request: HEAD https://huggingface.co/meta-llama/Llama-2-7b-chat-hf/resolve/main/config.json "HTTP/1.1 200 OK"
+2026-04-09 21:46:41,951 | INFO | httpx | HTTP Request: HEAD https://huggingface.co/meta-llama/Llama-2-7b-chat-hf/resolve/main/tokenizer_config.json "HTTP/1.1 200 OK"
+2026-04-09 21:46:42,002 | INFO | httpx | HTTP Request: GET https://huggingface.co/api/models/meta-llama/Llama-2-7b-chat-hf/tree/main/additional_chat_templates?recursive=false&expand=false "HTTP/1.1 404 Not Found"
+2026-04-09 21:46:42,052 | INFO | httpx | HTTP Request: GET https://huggingface.co/api/models/meta-llama/Llama-2-7b-chat-hf/tree/main?recursive=true&expand=false "HTTP/1.1 200 OK"
+2026-04-09 21:46:42,301 | INFO | httpx | HTTP Request: HEAD https://huggingface.co/meta-llama/Llama-2-7b-chat-hf/resolve/main/config.json "HTTP/1.1 200 OK"
+`torch_dtype` is deprecated! Use `dtype` instead!
+2026-04-09 21:46:42,359 | INFO | httpx | HTTP Request: HEAD https://huggingface.co/meta-llama/Llama-2-7b-chat-hf/resolve/main/config.json "HTTP/1.1 200 OK"
+Loading weights:   0%|          | 0/291 [00:00<?, ?it/s]Loading weights:   2%|▏         | 6/291 [00:00<00:05, 55.35it/s]Loading weights:   5%|▍         | 14/291 [00:00<00:04, 68.74it/s]Loading weights:   8%|▊         | 22/291 [00:00<00:03, 67.29it/s]Loading weights:  10%|▉         | 29/291 [00:00<00:04, 62.03it/s]Loading weights:  12%|█▏        | 36/291 [00:00<00:04, 62.14it/s]Loading weights:  15%|█▍        | 43/291 [00:00<00:04, 54.95it/s]Loading weights:  17%|█▋        | 49/291 [00:00<00:04, 54.81it/s]Loading weights:  19%|█▉        | 55/291 [00:00<00:04, 50.01it/s]Loading weights:  21%|██        | 61/291 [00:01<00:05, 44.90it/s]Loading weights:  23%|██▎       | 67/291 [00:01<00:04, 46.42it/s]Loading weights:  25%|██▍       | 72/291 [00:01<00:05, 43.66it/s]Loading weights:  27%|██▋       | 78/291 [00:01<00:04, 46.28it/s]Loading weights:  29%|██▉       | 85/291 [00:01<00:04, 51.24it/s]Loading weights:  31%|███▏      | 91/291 [00:01<00:04, 47.36it/s]Loading weights:  33%|███▎      | 96/291 [00:01<00:04, 41.39it/s]Loading weights:  35%|███▌      | 103/291 [00:02<00:04, 45.94it/s]Loading weights:  37%|███▋      | 108/291 [00:02<00:04, 43.53it/s]Loading weights:  39%|███▉      | 113/291 [00:02<00:04, 41.71it/s]Loading weights:  41%|████      | 119/291 [00:02<00:03, 44.68it/s]Loading weights:  43%|████▎     | 126/291 [00:02<00:03, 49.37it/s]Loading weights:  45%|████▌     | 132/291 [00:02<00:03, 43.27it/s]Loading weights:  48%|████▊     | 139/291 [00:02<00:03, 47.30it/s]Loading weights:  49%|████▉     | 144/291 [00:02<00:03, 44.56it/s]Loading weights:  51%|█████     | 149/291 [00:03<00:03, 42.70it/s]Loading weights:  53%|█████▎    | 154/291 [00:03<00:03, 44.47it/s]Loading weights:  55%|█████▍    | 159/291 [00:03<00:03, 39.49it/s]Loading weights:  57%|█████▋    | 167/291 [00:03<00:02, 49.18it/s]Loading weights:  59%|█████▉    | 173/291 [00:03<00:02, 50.62it/s]Loading weights:  62%|██████▏   | 179/291 [00:03<00:02, 46.01it/s]Loading weights:  63%|██████▎   | 184/291 [00:03<00:02, 46.96it/s]Loading weights:  65%|██████▍   | 189/291 [00:03<00:02, 44.37it/s]Loading weights:  67%|██████▋   | 194/291 [00:04<00:02, 42.46it/s]Loading weights:  68%|██████▊   | 199/291 [00:04<00:02, 44.27it/s]Loading weights:  70%|███████   | 204/291 [00:04<00:02, 39.53it/s]Loading weights:  73%|███████▎  | 212/291 [00:04<00:01, 48.46it/s]Loading weights:  75%|███████▍  | 218/291 [00:04<00:01, 49.18it/s]Loading weights:  77%|███████▋  | 224/291 [00:04<00:01, 44.90it/s]Loading weights:  79%|███████▉  | 230/291 [00:04<00:01, 43.80it/s]Loading weights:  81%|████████  | 236/291 [00:05<00:01, 46.03it/s]Loading weights:  83%|████████▎ | 241/291 [00:05<00:01, 42.82it/s]Loading weights:  85%|████████▍ | 247/291 [00:05<00:00, 45.33it/s]Loading weights:  87%|████████▋ | 252/291 [00:05<00:00, 43.42it/s]Loading weights:  89%|████████▊ | 258/291 [00:05<00:00, 47.53it/s]Loading weights:  91%|█████████ | 265/291 [00:05<00:00, 52.37it/s]Loading weights:  93%|█████████▎| 271/291 [00:05<00:00, 48.57it/s]Loading weights:  95%|█████████▍| 276/291 [00:05<00:00, 42.39it/s]Loading weights:  97%|█████████▋| 283/291 [00:06<00:00, 47.01it/s]Loading weights:  99%|█████████▉| 288/291 [00:06<00:00, 44.55it/s]Loading weights: 100%|██████████| 291/291 [00:06<00:00, 46.96it/s]
+2026-04-09 21:46:50,466 | INFO | httpx | HTTP Request: HEAD https://huggingface.co/meta-llama/Llama-2-7b-chat-hf/resolve/main/generation_config.json "HTTP/1.1 200 OK"
+2026-04-09 21:46:50,676 | INFO | httpx | HTTP Request: HEAD https://huggingface.co/checkpoints/lr_5e-5_ep_5_ratio_5/resolve/main/adapter_config.json "HTTP/1.1 404 Not Found"
+Traceback (most recent call last):
+  File "/home/amsyar/miniconda3/envs/llm-antidote/lib/python3.10/site-packages/huggingface_hub/utils/_http.py", line 761, in hf_raise_for_status
+    response.raise_for_status()
+  File "/home/amsyar/miniconda3/envs/llm-antidote/lib/python3.10/site-packages/httpx/_models.py", line 829, in raise_for_status
+    raise HTTPStatusError(message, request=request, response=self)
+httpx.HTTPStatusError: Client error '404 Not Found' for url 'https://huggingface.co/checkpoints/lr_5e-5_ep_5_ratio_5/resolve/main/adapter_config.json'
+For more information check: https://developer.mozilla.org/en-US/docs/Web/HTTP/Status/404
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File "/home/amsyar/miniconda3/envs/llm-antidote/lib/python3.10/site-packages/peft/config.py", line 317, in _get_peft_type
+    config_file = hf_hub_download(
+  File "/home/amsyar/miniconda3/envs/llm-antidote/lib/python3.10/site-packages/huggingface_hub/utils/_validators.py", line 88, in _inner_fn
+    return fn(*args, **kwargs)
+  File "/home/amsyar/miniconda3/envs/llm-antidote/lib/python3.10/site-packages/huggingface_hub/file_download.py", line 995, in hf_hub_download
+    return _hf_hub_download_to_cache_dir(
+  File "/home/amsyar/miniconda3/envs/llm-antidote/lib/python3.10/site-packages/huggingface_hub/file_download.py", line 1146, in _hf_hub_download_to_cache_dir
+    _raise_on_head_call_error(head_call_error, force_download, local_files_only)
+  File "/home/amsyar/miniconda3/envs/llm-antidote/lib/python3.10/site-packages/huggingface_hub/file_download.py", line 1778, in _raise_on_head_call_error
+    raise head_call_error
+  File "/home/amsyar/miniconda3/envs/llm-antidote/lib/python3.10/site-packages/huggingface_hub/file_download.py", line 1665, in _get_metadata_or_catch_error
+    metadata = get_hf_file_metadata(
+  File "/home/amsyar/miniconda3/envs/llm-antidote/lib/python3.10/site-packages/huggingface_hub/utils/_validators.py", line 88, in _inner_fn
+    return fn(*args, **kwargs)
+  File "/home/amsyar/miniconda3/envs/llm-antidote/lib/python3.10/site-packages/huggingface_hub/file_download.py", line 1587, in get_hf_file_metadata
+    response = _httpx_follow_relative_redirects_with_backoff(
+  File "/home/amsyar/miniconda3/envs/llm-antidote/lib/python3.10/site-packages/huggingface_hub/utils/_http.py", line 692, in _httpx_follow_relative_redirects_with_backoff
+    hf_raise_for_status(response)
+  File "/home/amsyar/miniconda3/envs/llm-antidote/lib/python3.10/site-packages/huggingface_hub/utils/_http.py", line 847, in hf_raise_for_status
+    raise repo_err from e
+huggingface_hub.errors.RepositoryNotFoundError: 404 Client Error. (Request ID: Root=1-69d8649a-77de9cd64356ec7b4e0b049c;1a72fdb2-fb89-4df7-a4f6-b7cb6fec1c90)
+
+Repository Not Found for url: https://huggingface.co/checkpoints/lr_5e-5_ep_5_ratio_5/resolve/main/adapter_config.json.
+Please make sure you specified the correct `repo_id` and `repo_type`.
+If you are trying to access a private or gated repo, make sure you are authenticated and your token has the required permissions.
+For more details, see https://huggingface.co/docs/huggingface_hub/authentication
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "/home/amsyar/miniconda3/envs/llm-antidote/lib/python3.10/runpy.py", line 196, in _run_module_as_main
+    return _run_code(code, main_globals, None,
+  File "/home/amsyar/miniconda3/envs/llm-antidote/lib/python3.10/runpy.py", line 86, in _run_code
+    exec(code, run_globals)
+  File "/home/amsyar/cs639/llm-post-finetuning-defenses/scripts/evaluate_safety.py", line 197, in <module>
+    main()
+  File "/home/amsyar/cs639/llm-post-finetuning-defenses/scripts/evaluate_safety.py", line 150, in main
+    peft_model = PeftModel.from_pretrained(base_model, str(args.adapter_path), is_trainable=False)
+  File "/home/amsyar/miniconda3/envs/llm-antidote/lib/python3.10/site-packages/peft/peft_model.py", line 459, in from_pretrained
+    config = PEFT_TYPE_TO_CONFIG_MAPPING[PeftConfig._get_peft_type(model_id, **hf_kwargs)].from_pretrained(
+  File "/home/amsyar/miniconda3/envs/llm-antidote/lib/python3.10/site-packages/peft/config.py", line 323, in _get_peft_type
+    raise ValueError(f"Can't find '{CONFIG_NAME}' at '{model_id}'")
+ValueError: Can't find 'adapter_config.json' at 'checkpoints/lr_5e-5_ep_5_ratio_5'
