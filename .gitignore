@@ -21,7 +21,7 @@ venv/
 # Model checkpoints and large files
 # checkpoints/
 *.bin
-*.safetensors
+# *.safetensors
 *.pt
 *.pth
 
