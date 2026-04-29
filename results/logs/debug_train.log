@@ -1,0 +1,80 @@
+/home/amsyar/miniconda3/envs/llm-antidote/bin/python: can't open file '/home/amsyar/cs639/llm-post-finetuning-defenses/train_attacks.py': [Errno 2] No such file or directory
+/home/amsyar/miniconda3/envs/llm-antidote/bin/python: can't open file '/home/amsyar/cs639/llm-post-finetuning-defenses/train_attacks.py': [Errno 2] No such file or directory
+/home/amsyar/miniconda3/envs/llm-antidote/bin/python: can't open file '/home/amsyar/cs639/llm-post-finetuning-defenses/train_attacks.py': [Errno 2] No such file or directory
+/home/amsyar/miniconda3/envs/llm-antidote/bin/python: can't open file '/home/amsyar/cs639/llm-post-finetuning-defenses/train_attacks.py': [Errno 2] No such file or directory
+/home/amsyar/miniconda3/envs/llm-antidote/bin/python: can't open file '/home/amsyar/cs639/llm-post-finetuning-defenses/train_attacks.py': [Errno 2] No such file or directory
+/home/amsyar/miniconda3/envs/llm-antidote/bin/python: can't open file '/home/amsyar/cs639/llm-post-finetuning-defenses/train_attacks.py': [Errno 2] No such file or directory
+/home/amsyar/miniconda3/envs/llm-antidote/bin/python: can't open file '/home/amsyar/cs639/llm-post-finetuning-defenses/train_attacks.py': [Errno 2] No such file or directory
+E0424 10:20:59.668000 3412550 site-packages/torch/distributed/elastic/multiprocessing/api.py:869] failed (exitcode: 2) local_rank: 0 (pid: 3412670) of binary: /home/amsyar/miniconda3/envs/llm-antidote/bin/python
+Traceback (most recent call last):
+  File "/home/amsyar/miniconda3/envs/llm-antidote/bin/accelerate", line 6, in <module>
+    sys.exit(main())
+  File "/home/amsyar/miniconda3/envs/llm-antidote/lib/python3.10/site-packages/accelerate/commands/accelerate_cli.py", line 50, in main
+    args.func(args)
+  File "/home/amsyar/miniconda3/envs/llm-antidote/lib/python3.10/site-packages/accelerate/commands/launch.py", line 1396, in launch_command
+    multi_gpu_launcher(args)
+  File "/home/amsyar/miniconda3/envs/llm-antidote/lib/python3.10/site-packages/accelerate/commands/launch.py", line 1023, in multi_gpu_launcher
+    distrib_run.run(args)
+  File "/home/amsyar/miniconda3/envs/llm-antidote/lib/python3.10/site-packages/torch/distributed/run.py", line 910, in run
+    elastic_launch(
+  File "/home/amsyar/miniconda3/envs/llm-antidote/lib/python3.10/site-packages/torch/distributed/launcher/api.py", line 138, in __call__
+    return launch_agent(self._config, self._entrypoint, list(args))
+  File "/home/amsyar/miniconda3/envs/llm-antidote/lib/python3.10/site-packages/torch/distributed/launcher/api.py", line 269, in launch_agent
+    raise ChildFailedError(
+torch.distributed.elastic.multiprocessing.errors.ChildFailedError: 
+============================================================
+train_attacks.py FAILED
+------------------------------------------------------------
+Failures:
+[1]:
+  time      : 2026-04-24_10:20:59
+  host      : instgpu-01.cs.wisc.edu
+  rank      : 1 (local_rank: 1)
+  exitcode  : 2 (pid: 3412671)
+  error_file: <N/A>
+  traceback : To enable traceback see: https://pytorch.org/docs/stable/elastic/errors.html
+[2]:
+  time      : 2026-04-24_10:20:59
+  host      : instgpu-01.cs.wisc.edu
+  rank      : 2 (local_rank: 2)
+  exitcode  : 2 (pid: 3412673)
+  error_file: <N/A>
+  traceback : To enable traceback see: https://pytorch.org/docs/stable/elastic/errors.html
+[3]:
+  time      : 2026-04-24_10:20:59
+  host      : instgpu-01.cs.wisc.edu
+  rank      : 3 (local_rank: 3)
+  exitcode  : 2 (pid: 3412674)
+  error_file: <N/A>
+  traceback : To enable traceback see: https://pytorch.org/docs/stable/elastic/errors.html
+[4]:
+  time      : 2026-04-24_10:20:59
+  host      : instgpu-01.cs.wisc.edu
+  rank      : 4 (local_rank: 4)
+  exitcode  : 2 (pid: 3412675)
+  error_file: <N/A>
+  traceback : To enable traceback see: https://pytorch.org/docs/stable/elastic/errors.html
+[5]:
+  time      : 2026-04-24_10:20:59
+  host      : instgpu-01.cs.wisc.edu
+  rank      : 5 (local_rank: 5)
+  exitcode  : 2 (pid: 3412676)
+  error_file: <N/A>
+  traceback : To enable traceback see: https://pytorch.org/docs/stable/elastic/errors.html
+[6]:
+  time      : 2026-04-24_10:20:59
+  host      : instgpu-01.cs.wisc.edu
+  rank      : 6 (local_rank: 6)
+  exitcode  : 2 (pid: 3412677)
+  error_file: <N/A>
+  traceback : To enable traceback see: https://pytorch.org/docs/stable/elastic/errors.html
+------------------------------------------------------------
+Root Cause (first observed failure):
+[0]:
+  time      : 2026-04-24_10:20:59
+  host      : instgpu-01.cs.wisc.edu
+  rank      : 0 (local_rank: 0)
+  exitcode  : 2 (pid: 3412670)
+  error_file: <N/A>
+  traceback : To enable traceback see: https://pytorch.org/docs/stable/elastic/errors.html
+============================================================
