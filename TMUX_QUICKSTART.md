@@ -1,213 +1,120 @@
-# Training with tmux - Quick Start Guide
+# tmux Training Guide
 
-## Why tmux?
+This guide shows a reusable tmux pattern for long LLM jobs and the exact command forms for this repository.
 
-`tmux` creates a **persistent session** that keeps running even if:
-- Your SSH connection drops
-- Your laptop goes to sleep/hibernates
-- Your internet disconnects
-- You close your terminal
+## Why tmux
 
-## Quick Start
+Use tmux for jobs that must survive SSH disconnects, laptop sleep, and terminal closes.
 
-### 1. Start Training (in background)
+## General Command Form
+
+Use this one-liner template for any long run:
 
 ```bash
-bash scripts/run_pipeline_tmux.sh
+mkdir -p results/logs && tmux new-session -d -s <session_name> "cd <repo_path> && source ~/miniconda3/etc/profile.d/conda.sh && conda activate llm-antidote && CUDA_VISIBLE_DEVICES=<gpu_ids> <launcher_and_script> <script_args> 2>&1 | tee results/logs/<session_name>.log"
 ```
 
-This starts training in a detached tmux session named `training`.
+Required substitutions:
+- `<session_name>`: short unique name (for example lisa_ratio1_lr5e-5_ep1)
+- `<repo_path>`: absolute path to the project on the cluster
+- `<gpu_ids>`: comma-separated GPU IDs (for example 0,1,2,3,4,5,6,7)
+- `<launcher_and_script>`:
+  - distributed train: `accelerate launch --num_processes N scripts/<script>.py`
+  - single-process scripts: `python scripts/<script>.py`
 
-**Output:**
-```
-Training started in tmux session: training
+Important rule:
+- `--num_processes` must equal the number of GPUs listed in `CUDA_VISIBLE_DEVICES`.
 
-To monitor training:
-  tmux attach-session -t training
-
-To view recent logs:
-  tail -f results/logs/training_*.log
-```
-
-### 2. Monitor Status
+## LISA Training Example (Correct Path)
 
 ```bash
-bash scripts/monitor_training.sh status
+mkdir -p results/logs && tmux new-session -d -s lisa_ratio1_lr5e-5_ep1 "cd ~/cs639/llm-post-finetuning-defenses && source ~/miniconda3/etc/profile.d/conda.sh && conda activate llm-antidote && CUDA_VISIBLE_DEVICES=0,1,2,3,4,5,6,7 accelerate launch --num_processes 8 scripts/train_lisa.py --dataset_path data/processed/ratio_1 --ratio 1 --learning_rate 5e-5 --epochs 1 --lisa_lambda 0.1 --base_model meta-llama/Llama-2-7b-chat-hf 2>&1 | tee results/logs/lisa_ratio1_lr5e-5_ep1.log"
 ```
 
-Shows:
-- ✓ Whether training is active
-- Latest checkpoint progress
-- How to reconnect
+Note:
+- The script path is `scripts/train_lisa.py`.
 
-### 3. View Logs
+## Attack Training Example
 
 ```bash
-bash scripts/monitor_training.sh logs
+mkdir -p results/logs && tmux new-session -d -s train_ratio1_lr5e-5_ep1 "cd ~/cs639/llm-post-finetuning-defenses && source ~/miniconda3/etc/profile.d/conda.sh && conda activate llm-antidote && CUDA_VISIBLE_DEVICES=1,4,5 accelerate launch --num_processes 3 scripts/train_attacks.py --learning_rate 5e-5 --epochs 1 --ratio 1 --dataset_root data/processed --output_root checkpoints --base_model meta-llama/Llama-2-7b-chat-hf 2>&1 | tee results/logs/train_ratio1_lr5e-5_ep1.log"
 ```
 
-Shows the last 100 lines of the current training log. Or use:
+## Script Compatibility Matrix
+
+- `scripts/train_attacks.py`
+  - Launcher: `accelerate launch`
+  - Multi-GPU: yes
+  - Key dataset arg: `--dataset_root data/processed`
+
+- `scripts/train_lisa.py`
+  - Launcher: `accelerate launch`
+  - Multi-GPU: yes
+  - Key dataset arg: `--dataset_path data/processed/ratio_<ratio>`
+
+- `scripts/prepare_data.py`
+  - Launcher: `python`
+  - Multi-GPU: no
+  - Output: processed datasets under `data/processed`
+
+- `scripts/apply_antidote.py`
+  - Launcher: `python`
+  - Multi-GPU: typically no (single process)
+
+- `scripts/evaluate_attack_success.py`
+  - Launcher: `python`
+  - Multi-GPU: typically no (single process)
+
+- `scripts/evaluate_baseline.py`
+  - Launcher: `python`
+  - Multi-GPU: no (single-process evaluation)
+
+- `scripts/evaluate_safety_utility.py`
+  - Launcher: `python`
+  - Multi-GPU: no practical benefit in current form
+  - Note: currently a fixed-script workflow (hardcoded model paths, no argparse)
+
+## tmux Operations
+
+Create and run detached:
 
 ```bash
-tail -f results/logs/training_*.log
+tmux new-session -d -s <session_name> "<your_command>"
 ```
 
-to stream logs in real-time.
-
-### 4. Reconnect After Disconnection
+Attach:
 
 ```bash
-tmux attach-session -t training
+tmux attach-session -t <session_name>
 ```
 
-This re-attaches your terminal to the running session.
+Detach without stopping:
 
-**To leave without stopping training:**
-- Press `Ctrl+B`, then `D` (detach)
-
-### 5. Stop Training (if needed)
-
-```bash
-bash scripts/monitor_training.sh kill
+```text
+Ctrl+B then D
 ```
 
-Or directly:
-```bash
-tmux kill-session -t training
-```
-
----
-
-## Advanced Usage
-
-### Custom Session Name
-
-```bash
-bash scripts/run_pipeline_tmux.sh my_experiment
-tmux attach-session -t my_experiment
-```
-
-### List All Sessions
+List sessions:
 
 ```bash
 tmux list-sessions
 ```
 
-Example output:
-```
-my_experiment: 1 windows (created Sat Apr 5 14:30:20 2026)
-training: 1 windows (created Sat Apr 5 14:20:35 2026)
-```
-
-### View Session Details
+Stop a session:
 
 ```bash
-tmux capture-pane -t training -p | head -50
+tmux kill-session -t <session_name>
 ```
 
-Shows the last 50 lines of the session (equivalent to scrolling up in the terminal).
-
----
-
-## Log Files
-
-All output is automatically saved to:
-```
-results/logs/training_YYYYMMDD_HHMMSS.log
-```
-
-Example:
-```
-results/logs/training_20260405_143500.log
-```
-
-View all logs:
-```bash
-ls -lh results/logs/
-```
-
----
-
-## Troubleshooting
-
-### tmux not installed?
-
-**Ubuntu/Debian:**
-```bash
-sudo apt-get update && sudo apt-get install -y tmux
-```
-
-**macOS:**
-```bash
-brew install tmux
-```
-
-**Windows (WSL2):**
-```bash
-sudo apt-get update && sudo apt-get install -y tmux
-```
-
-### Can't reconnect to session?
+Tail logs:
 
 ```bash
-# List all sessions
-tmux list-sessions
-
-# Try to attach
-tmux attach-session -t training
-
-# If that fails, the session might be dead. Restart:
-bash scripts/run_pipeline_tmux.sh
+tail -f results/logs/<session_name>.log
 ```
 
-### Port conflicts or old zombie processes?
+## Quick Safety Checks Before Launch
 
-```bash
-# Kill all training processes (careful!)
-pkill -f "train_attacks.py"
-
-# Or kill just the tmux session
-tmux kill-session -t training
-```
-
----
-
-## Monitoring Commands Summary
-
-| Command | Purpose |
-|---------|---------|
-| `bash scripts/run_pipeline_tmux.sh` | Start training in tmux |
-| `bash scripts/monitor_training.sh status` | Check if training is running |
-| `bash scripts/monitor_training.sh logs` | View latest log tail |
-| `bash scripts/monitor_training.sh attach` | Reconnect to session |
-| `tmux attach-session -t training` | Manually attach to session |
-| `tmux list-sessions` | List all active sessions |
-| `tail -f results/logs/training_*.log` | Stream logs in real-time |
-| `Ctrl+B D` | Detach from session (inside tmux) |
-
----
-
-## Example Workflow
-
-```bash
-# 1. Start training
-bash scripts/run_pipeline_tmux.sh
-
-# 2. Check status (while training runs)
-bash scripts/monitor_training.sh status
-
-# 3. Laptop goes to sleep... no problem!
-# (Connection drops but training continues in tmux)
-
-# 4. Reconnect later
-tmux attach-session -t training
-
-# 5. View logs
-bash scripts/monitor_training.sh logs
-
-# 6. Detach and let training continue
-# (Press Ctrl+B then D)
-
-# 7. When done, kill session
-bash scripts/monitor_training.sh kill
-```
+- Confirm script path starts with `scripts/`.
+- Confirm `CUDA_VISIBLE_DEVICES` count equals `--num_processes`.
+- Confirm ratio path exists for LISA, for example `data/processed/ratio_1`.
+- Keep session name and log filename identical for easier monitoring.
