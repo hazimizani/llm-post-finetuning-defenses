@@ -117,8 +117,8 @@ def _extract_anchor_prompt(example: dict) -> str | None:
     return None
 
 
-def _build_safety_anchor_dataset(sample_count: int, seed: int) -> Dataset:
-    anchor_ds = load_dataset("PKU-Alignment/BeaverTails", split="train")
+def _build_safety_anchor_dataset(tokenizer, sample_count: int, seed: int) -> Dataset:
+    anchor_ds = load_dataset("PKU-Alignment/BeaverTails", split="30k_train")
 
     if "is_safe" not in anchor_ds.column_names:
         raise KeyError("BeaverTails dataset must include an 'is_safe' column.")
@@ -135,7 +135,7 @@ def _build_safety_anchor_dataset(sample_count: int, seed: int) -> Dataset:
         prompt = _extract_anchor_prompt(row)
         if not prompt:
             prompt = "Provide a concise, safe and helpful response."
-        text = format_llama2_chat_text(prompt, response="I cannot help with harmful or unsafe requests.")
+        text = format_llama2_chat_text(tokenizer, prompt, assistant_response="I cannot help with harmful or unsafe requests.")
         return {"text": text}
 
     formatted = sampled_safe.map(_format_row, remove_columns=sampled_safe.column_names)
@@ -155,12 +155,12 @@ def main() -> None:
     LOGGER.info("Loading user dataset from %s", args.dataset_path)
     user_dataset = _load_user_dataset(args.dataset_path)
 
+    tokenizer = load_tokenizer(args.base_model, hf_token=hf_token)
+
     LOGGER.info("Loading and preparing %s safe BeaverTails anchors", args.safety_anchor_samples)
-    safety_anchor_dataset = _build_safety_anchor_dataset(sample_count=args.safety_anchor_samples, seed=args.seed)
+    safety_anchor_dataset = _build_safety_anchor_dataset(tokenizer, sample_count=args.safety_anchor_samples, seed=args.seed)
 
     combined_dataset = concatenate_datasets([user_dataset, safety_anchor_dataset]).shuffle(seed=args.seed)
-
-    tokenizer = load_tokenizer(args.base_model, hf_token=hf_token)
     local_rank = int(os.environ.get("LOCAL_RANK", "-1"))
     if local_rank >= 0:
         model_device_map: str | dict[str, int] = {"": local_rank}
